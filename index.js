@@ -51,7 +51,7 @@ const start = () => {
                 break;
             default:
                 console.log('Bye!');
-                break;
+                process.exit()
         }
     })
 }
@@ -100,7 +100,6 @@ const addDepartment = () => {
                 console.error(err);
             }
             console.log('\n');
-            console.table(res);
             console.log('\nAdded Department to Database');
             start();
         });
@@ -120,7 +119,7 @@ const addRole = () => {
             message: 'What is the salary of this role?'
         }
     ]).then((role) => {
-        db.query('SELECT name FROM department', (err, res) => {
+        db.query('SELECT name, id FROM department', (err, res) => {
             if (err) {
                 console.error(err);
             }
@@ -130,7 +129,10 @@ const addRole = () => {
                 message: 'Which department does the role belong to?',
                 choices: res.map((department) => department.name)
             }).then((answer) => {
-                db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)' [role.name, role.salary, answer.department_id], (err, res) => {
+                const depID = res.filter((data) => data.name === answer.department)[0].id;
+                console.log(depID);
+                db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [role.name, role.salary, depID], (err, res) => {
+                    console.log(res);
                     if (err) {
                         console.error(err);
                     }
